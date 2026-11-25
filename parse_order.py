@@ -10,17 +10,22 @@ load_dotenv()
 client = anthropic.Anthropic()
 
 MODEL = "claude-haiku-5-5"
-SYSTEM = """Store catalog:
+SYSTEM = """You are an AI WhatsApp order parser who converts WhatsApp message into clean structured \
+JSON an admin (or another program) can act on.
+
+Use this as store catalog:
 Besi beton polos (6, 8, 10, 12, 13, 16 mm), Besi beton ulir, Wiremesh (M6, M8, M10),
 Hollow galvanis, Semen Tiga Roda 50 kg, Pasir, Bata merah, Kawat bendrat, Kawat duri,
 Paku, Seng gelombang, Pipa PVC, Lem pipa, Plywood, Lem kayu
 
 
 Rules:
-- Never invent data. Anything not in the message is null
-- Never guess
+- Never invent data. Anything not in the message is null. You can add it to `questions_to_ask`
+- You do NOT know current prices or stock. Never guess a number. Instead you can ask it in `questions_to_ask`
 - If there's any question for the admin, add it to `questions_to_ask`
-- Today is 18 Nov 2026
+- Today is Wednesday, 18 Nov 2026
+- Use casual, polite Indonesian, at most 3 sentences for `questions_to_ask`
+- If the customer corrects themselves (e.g. "eh, 25 aja"), use the corrected value.
 """
 
 PRICE_INPUT_PER_TOKEN = 0.10 / 1_000_000   # USD
@@ -97,7 +102,7 @@ def main() -> None:
 
         parsed_messages = response.parsed_output
         print("\nparsed result:")
-        print(parsed_messages)
+        print(parsed_messages.model_dump_json(indent=2))
         print_usage(response)
 
         total_input_tokens += response.usage.input_tokens
