@@ -45,7 +45,7 @@ class OrderItem(BaseModel):
         description="Dozen = 12 pcs"
     )
     unit: Optional[Literal["pcs", "kg", "truck", "roll", "sheet", "other"]] = Field(
-        description="batang, biji, sak, and kaleng = pcs"
+        description="batang, biji, sak, and kaleng = pcs. No unit given = null. Other than that, should use `other`"
     )
     original_text: str           # the customer's own words for this item
 
