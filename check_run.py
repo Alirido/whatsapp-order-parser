@@ -82,7 +82,8 @@ def show(value):
     if isinstance(value, set):
         return " or ".join(sorted(show(v) for v in value))
     if isinstance(value, Contains):
-        return f"text containing {json.dumps(value.text, ensure_ascii=False)}"
+        return "text containing " + " and ".join(json.dumps(p, ensure_ascii=False)
+                                                 for p in value.parts)
     return json.dumps(value, ensure_ascii=False)
 
 
@@ -108,7 +109,7 @@ def matches(got, want):
     if isinstance(want, set):
         return any(matches(got, option) for option in want)
     if isinstance(want, Contains):
-        return isinstance(got, str) and want.text.lower() in got.lower()
+        return isinstance(got, str) and all(p.lower() in got.lower() for p in want.parts)
     return got == want
 
 
