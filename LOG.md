@@ -25,10 +25,11 @@ Product, spec and quantity right?
 
 ## Summary
 
-| Run | Date       | Commit  | What changed                                      | Score | Cost      | Failed              |
-| --- | ---------- | ------- | ------------------------------------------------- | ----- | --------- | ------------------- |
-| 01 | 2026-11-25 | 415dc5f | Baseline | ?/10 | $0.006057 | 1, 2, 3, 4, 6, 7, 8 |
-| 02 | 2026-11-26 | 1ba31ca | parse_order: typed date/time, time_of_day, closed unit list, conditional_order; improved unit description | ?/10 | $0.006421 | 6 |
+| Run | Date       | Commit  | What changed                                                                                              | Score | Cost      | Failed              |
+| --- | ---------- | ------- | --------------------------------------------------------------------------------------------------------- | ----- | --------- | ------------------- |
+| 01  | 2026-11-25 | 415dc5f | Baseline                                                                                                  | ?/10  | $0.006057 | 1, 2, 3, 4, 6, 7, 8 |
+| 02  | 2026-11-26 | 1ba31ca | parse_order: typed date/time, time_of_day, closed unit list, conditional_order; improved unit description | ?/10  | $0.006421 | 6                   |
+| 03a | 2026-11-26 | 9a56dd7 | parse_order: describe address field so a bare area counts                                                 | 10/10 | $0.006769 |                     |
 
 ## Backlog
 
@@ -48,18 +49,18 @@ Quality wishes: worth improving, but they don't decide pass/fail.
 
 Raw output: `runs/01-baseline.txt`
 
-| # | intent | date | fulfillment | items | time | time_of_day | address | Pass | Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | ✓ | ✓ | ✓ | ✓ | ✗ | – | ✓ | no | time: expected null, got "pagi" |
-| 2 | ✓ | ✗ | ✓ | ✓ | ✓ | – | ✓ | no | date: expected "2026-11-23", got "Senin, 23 Nov 2026" |
-| 3 | ✗ | ✓ | ✓ | ✓ | ✓ | – | ✓ | no | intent: expected "conditional_order", got "new_order" |
-| 4 | ✓ | ✗ | ✓ | ✓ | ✓ | – | ✓ | no | date: expected "2026-11-19", got null |
-| 5 | ✓ | ✓ | ✓ | ✓ | ✓ | – | ✓ |  |  |
-| 6 | ✓ | ✗ | ✓ | ✓ | ✗ | – | ✗ | no | date: expected "2026-11-20", got "Jumat, 20 Nov 2026"; time: expected null, got "sore"; address: expected text containing "Cijerah", got null |
-| 7 | ✓ | ✗ | ✓ | ✓ | ✓ | – | ✓ | no | date: expected "2026-11-18", got null |
-| 8 | ✓ | ✓ | ✓ | ✓ | ✗ | – | ✓ | no | time: expected null, got "siang" |
-| 9 | ✓ | ✓ | ✓ | ✓ | ✓ | – | ✓ |  |  |
-| 10 | ✓ | ✓ | ✓ | ✓ | ✓ | – | ✓ |  |  |
+| #   | intent | date | fulfillment | items | time | time_of_day | address | Pass | Notes                                                                                                                                         |
+| --- | ------ | ---- | ----------- | ----- | ---- | ----------- | ------- | ---- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | ✓      | ✓    | ✓           | ✓     | ✗    | –           | ✓       | no   | time: expected null, got "pagi"                                                                                                               |
+| 2   | ✓      | ✗    | ✓           | ✓     | ✓    | –           | ✓       | no   | date: expected "2026-11-23", got "Senin, 23 Nov 2026"                                                                                         |
+| 3   | ✗      | ✓    | ✓           | ✓     | ✓    | –           | ✓       | no   | intent: expected "conditional_order", got "new_order"                                                                                         |
+| 4   | ✓      | ✗    | ✓           | ✓     | ✓    | –           | ✓       | no   | date: expected "2026-11-19", got null                                                                                                         |
+| 5   | ✓      | ✓    | ✓           | ✓     | ✓    | –           | ✓       |      |                                                                                                                                               |
+| 6   | ✓      | ✗    | ✓           | ✓     | ✗    | –           | ✗       | no   | date: expected "2026-11-20", got "Jumat, 20 Nov 2026"; time: expected null, got "sore"; address: expected text containing "Cijerah", got null |
+| 7   | ✓      | ✗    | ✓           | ✓     | ✓    | –           | ✓       | no   | date: expected "2026-11-18", got null                                                                                                         |
+| 8   | ✓      | ✓    | ✓           | ✓     | ✗    | –           | ✓       | no   | time: expected null, got "siang"                                                                                                              |
+| 9   | ✓      | ✓    | ✓           | ✓     | ✓    | –           | ✓       |      |                                                                                                                                               |
+| 10  | ✓      | ✓    | ✓           | ✓     | ✓    | –           | ✓       |      |                                                                                                                                               |
 
 Fields: intent 9/10 · date 6/10 · fulfillment 10/10 · items 10/10 · time 7/10 · address 9/10
 
@@ -73,22 +74,47 @@ Next change:
 
 Raw output: `runs/02-typed-fields.txt`
 
-| # | intent | date | fulfillment | items | time | time_of_day | address | Pass | Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |  |  |
-| 2 | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |  |  |
-| 3 | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |  |  |
-| 4 | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |  |  |
-| 5 | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |  |  |
-| 6 | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ | no | address: expected text containing "Cijerah", got null |
-| 7 | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |  |  |
-| 8 | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |  |  |
-| 9 | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |  |  |
-| 10 | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |  |  |
+| #   | intent | date | fulfillment | items | time | time_of_day | address | Pass | Notes                                                 |
+| --- | ------ | ---- | ----------- | ----- | ---- | ----------- | ------- | ---- | ----------------------------------------------------- |
+| 1   | ✓      | ✓    | ✓           | ✓     | ✓    | ✓           | ✓       |      |                                                       |
+| 2   | ✓      | ✓    | ✓           | ✓     | ✓    | ✓           | ✓       |      |                                                       |
+| 3   | ✓      | ✓    | ✓           | ✓     | ✓    | ✓           | ✓       |      |                                                       |
+| 4   | ✓      | ✓    | ✓           | ✓     | ✓    | ✓           | ✓       |      |                                                       |
+| 5   | ✓      | ✓    | ✓           | ✓     | ✓    | ✓           | ✓       |      |                                                       |
+| 6   | ✓      | ✓    | ✓           | ✓     | ✓    | ✓           | ✗       | no   | address: expected text containing "Cijerah", got null |
+| 7   | ✓      | ✓    | ✓           | ✓     | ✓    | ✓           | ✓       |      |                                                       |
+| 8   | ✓      | ✓    | ✓           | ✓     | ✓    | ✓           | ✓       |      |                                                       |
+| 9   | ✓      | ✓    | ✓           | ✓     | ✓    | ✓           | ✓       |      |                                                       |
+| 10  | ✓      | ✓    | ✓           | ✓     | ✓    | ✓           | ✓       |      |                                                       |
 
 Fields: intent 10/10 · date 10/10 · fulfillment 10/10 · items 10/10 · time 10/10 · time_of_day 10/10 · address 9/10
 
 Tokens: 20,952 in / 8,651 out · cost $0.006421 · time 50s
+
+Pattern:
+
+Next change:
+
+## Run 03a: address-new-rule (9a56dd7)
+
+Raw output: `runs/03a-address-new-rule.txt`
+
+| #   | intent | date | fulfillment | items | time | time_of_day | address | Pass | Notes |
+| --- | ------ | ---- | ----------- | ----- | ---- | ----------- | ------- | ---- | ----- |
+| 1   | ✓      | ✓    | ✓           | ✓     | ✓    | ✓           | ✓       |      |       |
+| 2   | ✓      | ✓    | ✓           | ✓     | ✓    | ✓           | ✓       |      |       |
+| 3   | ✓      | ✓    | ✓           | ✓     | ✓    | ✓           | ✓       |      |       |
+| 4   | ✓      | ✓    | ✓           | ✓     | ✓    | ✓           | ✓       |      |       |
+| 5   | ✓      | ✓    | ✓           | ✓     | ✓    | ✓           | ✓       |      |       |
+| 6   | ✓      | ✓    | ✓           | ✓     | ✓    | ✓           | ✓       |      |       |
+| 7   | ✓      | ✓    | ✓           | ✓     | ✓    | ✓           | ✓       |      |       |
+| 8   | ✓      | ✓    | ✓           | ✓     | ✓    | ✓           | ✓       |      |       |
+| 9   | ✓      | ✓    | ✓           | ✓     | ✓    | ✓           | ✓       |      |       |
+| 10  | ✓      | ✓    | ✓           | ✓     | ✓    | ✓           | ✓       |      |       |
+
+Fields: intent 10/10 · date 10/10 · fulfillment 10/10 · items 10/10 · time 10/10 · time_of_day 10/10 · address 10/10
+
+Tokens: 22,902 in / 8,957 out · cost $0.006769 · time 52s
 
 Pattern:
 

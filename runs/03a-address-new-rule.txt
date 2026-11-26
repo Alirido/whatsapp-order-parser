@@ -1,0 +1,360 @@
+commit: 9a56dd7  date: 2026-11-26
+
+===== message 1/10 =====
+ko pesen besi polos 10 20 btg sama wiremesh m8 5 lembar ya. kirim ke jl gegerkalong hilir no 45 besok pagi. a.n. pak budi 0812-0000-1234
+{
+  "intent": "new_order",
+  "customer_name": "Pak Budi",
+  "phone": "0812-0000-1234",
+  "items": [
+    {
+      "product": "Besi beton polos",
+      "spec": "10 mm",
+      "quantity": 20.0,
+      "unit": "pcs",
+      "original_text": "besi polos 10 20 btg"
+    },
+    {
+      "product": "Wiremesh",
+      "spec": "M8",
+      "quantity": 5.0,
+      "unit": "sheet",
+      "original_text": "wiremesh m8 5 lembar"
+    }
+  ],
+  "fulfillment": "delivery",
+  "address": "Jl. Gegerkalong Hilir No 45",
+  "date": "2026-11-19",
+  "time": null,
+  "time_of_day": "morning",
+  "payment_method": null,
+  "notes": null,
+  "questions_to_ask": [
+    "Untuk besi polos, apakah ukurannya 10 mm ya, Kak?",
+    "Untuk pengiriman besok pagi, apakah ada jam tertentu yang diinginkan, Kak?",
+    "Mohon konfirmasi metode pembayarannya ya, Kak?"
+  ]
+}
+tokens: 2,304 in / 835 out   cost: $0.000648 (about Rp 11.66)
+
+===== message 2/10 =====
+Selamat siang, saya Ibu Rina dari CV Karya Bangun. Mau order semen tiga roda 40 sak, pasir 1 truk, dan bata merah 2000 biji. Dikirim ke proyek di Jl. Setiabudi 210 hari Senin. Pembayaran transfer ya. Terima kasih
+{
+  "intent": "new_order",
+  "customer_name": "Ibu Rina (CV Karya Bangun)",
+  "phone": null,
+  "items": [
+    {
+      "product": "Semen Tiga Roda",
+      "spec": "50 kg",
+      "quantity": 40.0,
+      "unit": "pcs",
+      "original_text": "semen tiga roda 40 sak"
+    },
+    {
+      "product": "Pasir",
+      "spec": null,
+      "quantity": 1.0,
+      "unit": "truck",
+      "original_text": "pasir 1 truk"
+    },
+    {
+      "product": "Bata merah",
+      "spec": null,
+      "quantity": 2000.0,
+      "unit": "pcs",
+      "original_text": "bata merah 2000 biji"
+    }
+  ],
+  "fulfillment": "delivery",
+  "address": "Jl. Setiabudi 210",
+  "date": "2026-11-23",
+  "time": null,
+  "time_of_day": null,
+  "payment_method": "Transfer",
+  "notes": "Proyek CV Karya Bangun",
+  "questions_to_ask": [
+    "Boleh minta nomor telepon yang bisa dihubungi, Bu?",
+    "Jam berapa kira-kira pengiriman di hari Senin, Bu?",
+    "Untuk pasir 1 truk, ada jenis pasir tertentu yang diinginkan, Bu?"
+  ]
+}
+tokens: 2,342 in / 1,212 out   cost: $0.000840 (about Rp 15.12)
+
+===== message 3/10 =====
+bang hollow 4x4 brp? kalo ada aku ambil 30 btg
+{
+  "intent": "conditional_order",
+  "customer_name": null,
+  "phone": null,
+  "items": [
+    {
+      "product": "Hollow galvanis",
+      "spec": "4x4",
+      "quantity": 30.0,
+      "unit": "pcs",
+      "original_text": "hollow 4x4 brp? kalo ada aku ambil 30 btg"
+    }
+  ],
+  "fulfillment": "unknown",
+  "address": null,
+  "date": null,
+  "time": null,
+  "time_of_day": null,
+  "payment_method": null,
+  "notes": "Customer asks for the price of hollow 4x4 and will order 30 batang if it is in stock.",
+  "questions_to_ask": [
+    "Kak, untuk hollow galvanis 4x4 ada stoknya dan berapa harga per batangnya ya? Nanti saya kabarkan ke customer.",
+    "Kakak mau diambil sendiri atau diantar ke alamat?"
+  ]
+}
+tokens: 2,255 in / 602 out   cost: $0.000527 (about Rp 9.48)
+
+===== message 4/10 =====
+ko besok buka jam brp?
+{
+  "intent": "question",
+  "customer_name": null,
+  "phone": null,
+  "items": [],
+  "fulfillment": "unknown",
+  "address": null,
+  "date": "2026-11-19",
+  "time": null,
+  "time_of_day": null,
+  "payment_method": null,
+  "notes": "Customer menanyakan jam buka toko besok.",
+  "questions_to_ask": [
+    "Customer menanyakan jam buka toko besok (Kamis, 19 Nov 2026). Mohon info jam buka tokonya ya, Kak."
+  ]
+}
+tokens: 2,238 in / 489 out   cost: $0.000468 (about Rp 8.43)
+
+===== message 5/10 =====
+pesenan yg kmrn besi 12 nya batalin aja ya ko, ganti jd besi 13 aja jumlahnya sama
+{
+  "intent": "change_order",
+  "customer_name": null,
+  "phone": null,
+  "items": [
+    {
+      "product": "Besi beton polos",
+      "spec": "13 mm",
+      "quantity": null,
+      "unit": null,
+      "original_text": "besi 13"
+    }
+  ],
+  "fulfillment": "unknown",
+  "address": null,
+  "date": null,
+  "time": null,
+  "time_of_day": null,
+  "payment_method": null,
+  "notes": "Batalkan pesanan besi 12 mm dari kemarin. Ganti dengan besi beton polos 13 mm dengan jumlah yang sama seperti pesanan sebelumnya.",
+  "questions_to_ask": [
+    "Kak, boleh minta nama atau nomor HP yang dipakai waktu pesan kemarin supaya kami bisa cari pesanannya?",
+    "Jumlah besi 12 mm kemarin berapa batang ya Kak? Kami perlu tahu jumlahnya untuk pesanan besi 13 mm ini.",
+    "Untuk besi 13 mm, mau yang polos atau ulir ya Kak?"
+  ]
+}
+tokens: 2,274 in / 793 out   cost: $0.000624 (about Rp 11.23)
+
+===== message 6/10 =====
+halo ko ini pak asep yg di cijerah itu loh ko mau ambil lagi kayak biasa ya besi 8 50 batang terus besi 10 nya 25 eh 30 aja deh ko sama kawat bendrat 2 rol nanti dianter aja ke rumah sore2 lusa ya ko makasih
+{
+  "intent": "new_order",
+  "customer_name": "Pak Asep",
+  "phone": null,
+  "items": [
+    {
+      "product": "Besi beton polos",
+      "spec": "8 mm",
+      "quantity": 50.0,
+      "unit": "pcs",
+      "original_text": "besi 8 50 batang"
+    },
+    {
+      "product": "Besi beton polos",
+      "spec": "10 mm",
+      "quantity": 30.0,
+      "unit": null,
+      "original_text": "besi 10 nya 25 eh 30 aja deh"
+    },
+    {
+      "product": "Kawat bendrat",
+      "spec": null,
+      "quantity": 2.0,
+      "unit": "roll",
+      "original_text": "kawat bendrat 2 rol"
+    }
+  ],
+  "fulfillment": "delivery",
+  "address": "Cijerah",
+  "date": "2026-11-20",
+  "time": null,
+  "time_of_day": "afternoon",
+  "payment_method": null,
+  "notes": "Pelanggan ingin mengambil lagi pesanan seperti biasa. Pesanan besi 10 sudah dikoreksi dari 25 menjadi 30.",
+  "questions_to_ask": [
+    "Pak Asep, boleh minta alamat lengkapnya di Cijerah (nama jalan dan nomor rumah) ya?",
+    "Pak Asep, untuk besi 8 mm mau yang polos atau ulir ya?",
+    "Pak Asep, besi 10 mm 30 itu batang atau satuan lainnya ya?",
+    "Pak Asep, boleh minta nomor WhatsApp yang bisa dihubungi untuk konfirmasi pengiriman?",
+    "Pak Asep, pembayarannya mau bagaimana ya (tunai atau transfer)?"
+  ]
+}
+tokens: 2,339 in / 1,447 out   cost: $0.000957 (about Rp 17.23)
+
+===== message 7/10 =====
+Mau pesan pipa paralon 3 inch dua belas batang, lem pipa setengah lusin. Ambil sendiri ke toko jam 2 siang. -Yanto
+{
+  "intent": "new_order",
+  "customer_name": "Yanto",
+  "phone": null,
+  "items": [
+    {
+      "product": "Pipa PVC",
+      "spec": "3 inch",
+      "quantity": 12.0,
+      "unit": "pcs",
+      "original_text": "pipa paralon 3 inch dua belas batang"
+    },
+    {
+      "product": "Lem pipa",
+      "spec": null,
+      "quantity": 6.0,
+      "unit": null,
+      "original_text": "lem pipa setengah lusin"
+    }
+  ],
+  "fulfillment": "pickup",
+  "address": null,
+  "date": "2026-11-18",
+  "time": "14:00",
+  "time_of_day": null,
+  "payment_method": null,
+  "notes": "Pelanggan akan mengambil sendiri ke toko.",
+  "questions_to_ask": [
+    "Kak Yanto, untuk lem pipa setengah lusin itu maksudnya 6 pcs ya? Mohon konfirmasi satuannya.",
+    "Apakah pipa paralon 3 inch yang dimaksud adalah Pipa PVC dari katalog kami?",
+    "Mohon konfirmasi nomor telepon Kak Yanto untuk keperluan pesanan ya."
+  ]
+}
+tokens: 2,288 in / 923 out   cost: $0.000690 (about Rp 12.43)
+
+===== message 8/10 =====
+Order: 10 lembar seng gelombang 0.3, 3 kg paku 5cm, 1 roll kawat duri. Total kmrn ditawarin 1.250.000 ya ko sesuai chat. Kirim ke Jl. Sukajadi 88 Kamis siang. COD.
+{
+  "intent": "new_order",
+  "customer_name": null,
+  "phone": null,
+  "items": [
+    {
+      "product": "Seng gelombang",
+      "spec": "0.3",
+      "quantity": 10.0,
+      "unit": "sheet",
+      "original_text": "10 lembar seng gelombang 0.3"
+    },
+    {
+      "product": "Paku",
+      "spec": "5cm",
+      "quantity": 3.0,
+      "unit": "kg",
+      "original_text": "3 kg paku 5cm"
+    },
+    {
+      "product": "Kawat duri",
+      "spec": null,
+      "quantity": 1.0,
+      "unit": "roll",
+      "original_text": "1 roll kawat duri"
+    }
+  ],
+  "fulfillment": "delivery",
+  "address": "Jl. Sukajadi 88",
+  "date": "2026-11-19",
+  "time": null,
+  "time_of_day": "midday",
+  "payment_method": "COD",
+  "notes": "Customer mengatakan total kemarin ditawarkan Rp 1.250.000 sesuai chat sebelumnya. Total ini belum diverifikasi.",
+  "questions_to_ask": [
+    "Kak, boleh minta nama dan nomor HP customer untuk order ini?",
+    "Kak, total Rp 1.250.000 yang ditawarkan kemarin sudah sesuai dengan harga sekarang belum ya? Mohon dicek lagi, karena kami belum punya data harga terbaru di sini.",
+    "Untuk seng gelombang 0.3, maksudnya ketebalan 0.3 mm ya kak? Mohon dikonfirmasi.",
+    "Kak, mau kirim jam berapa tepatnya di hari Kamis siang?"
+  ]
+}
+tokens: 2,328 in / 1,034 out   cost: $0.000750 (about Rp 13.50)
+
+===== message 9/10 =====
+Hi, need 2 sheets of 9mm plywood and 1 tin of wood glue, can you deliver to Dago today? Name: Kevin
+{
+  "intent": "new_order",
+  "customer_name": "Kevin",
+  "phone": null,
+  "items": [
+    {
+      "product": "Plywood",
+      "spec": "9mm",
+      "quantity": 2.0,
+      "unit": "sheet",
+      "original_text": "2 sheets of 9mm plywood"
+    },
+    {
+      "product": "Lem kayu",
+      "spec": null,
+      "quantity": 1.0,
+      "unit": "pcs",
+      "original_text": "1 tin of wood glue"
+    }
+  ],
+  "fulfillment": "delivery",
+  "address": "Dago",
+  "date": "2026-11-18",
+  "time": null,
+  "time_of_day": null,
+  "payment_method": null,
+  "notes": null,
+  "questions_to_ask": [
+    "Kak Kevin, boleh minta alamat lengkapnya di daerah Dago (nama jalan dan nomor rumah)?",
+    "Boleh minta nomor WhatsApp atau telepon yang bisa dihubungi untuk pengiriman?",
+    "Kira-kira jam berapa atau pagi/siang/sore yang paling pas untuk pengirimannya hari ini?",
+    "Metode pembayarannya mau bagaimana, kak?"
+  ]
+}
+tokens: 2,276 in / 707 out   cost: $0.000581 (about Rp 10.46)
+
+===== message 10/10 =====
+ko besi beton yg biasa ya 1 ikat, kirim ke alamat biasa
+{
+  "intent": "new_order",
+  "customer_name": null,
+  "phone": null,
+  "items": [
+    {
+      "product": "Besi beton",
+      "spec": null,
+      "quantity": 1.0,
+      "unit": "other",
+      "original_text": "besi beton yg biasa ya 1 ikat"
+    }
+  ],
+  "fulfillment": "delivery",
+  "address": null,
+  "date": null,
+  "time": null,
+  "time_of_day": null,
+  "payment_method": null,
+  "notes": "Customer ingin besi beton yang biasa dibeli dan dikirim ke alamat biasa. Ikat bukan satuan di katalog, jadi unit dicatat sebagai other.",
+  "questions_to_ask": [
+    "Besi beton yang biasa itu yang polos atau ulir ya kak, dan ukurannya berapa mm?",
+    "1 ikat itu isinya berapa batang ya kak?",
+    "Alamat biasanya yang mana ya kak? Boleh kirim alamat lengkapnya untuk pengiriman?"
+  ]
+}
+tokens: 2,258 in / 915 out   cost: $0.000683 (about Rp 12.30)
+
+TOTAL (10 messages, 0 failed): tokens: 22,902 in / 8,957 out   cost: $0.006769 (about Rp 121.84)
+elapsed: 52s
