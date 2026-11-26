@@ -27,9 +27,9 @@ Product, spec and quantity right?
 
 | Run | Date       | Commit  | What changed                                                                                              | Score | Cost      | Failed              |
 | --- | ---------- | ------- | --------------------------------------------------------------------------------------------------------- | ----- | --------- | ------------------- |
-| 01 | 2026-11-25 | 415dc5f | Baseline | 3/10 | $0.006057 | 1, 2, 3, 4, 6, 7, 8 |
-| 02 | 2026-11-26 | 1ba31ca | parse_order: typed date/time, time_of_day, closed unit list, conditional_order; improved unit description | 9/10 | $0.006421 | 6 |
-| 03a | 2026-11-26 | 9a56dd7 | parse_order: describe address field so a bare area counts | 10/10 | $0.006769 |  |
+| 01 | 2026-11-25 | e40f4f8 | Baseline | 3/10 | $0.006057 | 1, 2, 3, 4, 6, 7, 8 |
+| 02 | 2026-11-26 | 5d104ba | parse_order: typed date/time, time_of_day, closed unit list, conditional_order; improved unit description | 9/10 | $0.006421 | 6 |
+| 03a | 2026-11-26 | 346d7de | parse_order: describe address field so a bare area counts | 10/10 | $0.006769 |  |
 
 ## Backlog
 
@@ -45,7 +45,7 @@ Quality wishes: worth improving, but they don't decide pass/fail.
 - Msg 2 (run 01): too many questions. Questions 4, 5 and 7 aren't needed, and
   3 and 6 can be merged.
 
-## Run 01: baseline (415dc5f)
+## Run 01: baseline (e40f4f8)
 
 Raw output: `runs/01-baseline.txt`
 
@@ -70,7 +70,7 @@ Pattern:
 
 Next change:
 
-## Run 02: typed-fields (1ba31ca)
+## Run 02: typed-fields (5d104ba)
 
 Raw output: `runs/02-typed-fields.txt`
 
@@ -95,7 +95,7 @@ Pattern:
 
 Next change:
 
-## Run 03a: address-new-rule (9a56dd7)
+## Run 03a: address-new-rule (346d7de)
 
 Raw output: `runs/03a-address-new-rule.txt`
 

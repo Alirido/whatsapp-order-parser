@@ -1,0 +1,15 @@
+# Secrets: your API key lives here. Never commit.
+.env
+.env.*
+!.env.example
+
+# Python virtual environment (recreate with: pip install -r requirements.txt)
+.venv/
+venv/
+
+# Python's auto-generated cache files
+__pycache__/
+*.pyc
+
+# Claude Code personal settings
+**/.claude/settings.local.json
