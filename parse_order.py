@@ -1,4 +1,5 @@
 import argparse
+import datetime as dt
 import re
 import sys
 from typing import Literal, Optional
@@ -18,7 +19,7 @@ JSON an admin (or another program) can act on.
 
 Store's catalog:
 Besi beton polos (6, 8, 10, 12, 13, 16 mm), Besi beton ulir, Wiremesh (M6, M8, M10),
-Hollow galvanis, Semen Tiga Roda 50 kg, Pasir, Bata merah, Kawat bendrat, Kawat duri,
+Hollow galvanis, Semen Tiga Roda (50 kg), Pasir, Bata merah, Kawat bendrat, Kawat duri,
 Paku, Seng gelombang, Pipa PVC, Lem pipa, Plywood, Lem kayu
 
 
@@ -30,6 +31,7 @@ Rules:
 - Normalize product names using the store's catalog.
 - Use casual, polite Indonesian for `questions_to_ask`
 - If the customer corrects themselves (e.g. "eh, 25 aja"), use the corrected value.
+- An exception to never invent data: If the customer only says the time without day or date, assume it's for today
 """
 
 PRICE_INPUT_PER_TOKEN = 0.10 / 1_000_000   # USD
@@ -39,19 +41,30 @@ USD_TO_IDR = 18_000
 class OrderItem(BaseModel):
     product: str                 # normalized catalog name
     spec: Optional[str]          # size or grade: "10 mm", "M8", "3 inch"
-    quantity: Optional[float]
-    unit: Optional[str]          # batang, lembar, sak, kg, rol, ...
+    quantity: Optional[float] = Field(
+        description="Dozen = 12 pcs"
+    )
+    unit: Optional[Literal["pcs", "kg", "truck", "roll", "sheet", "other"]] = Field(
+        description="batang, biji, sak, and kaleng = pcs"
+    )
     original_text: str           # the customer's own words for this item
 
 class ParsedMessage(BaseModel):
-    intent: Literal["new_order", "change_order", "question", "other"]
+    intent: Literal["new_order", "change_order", "question", "conditional_order", "other"]
     customer_name: Optional[str]
     phone: Optional[str]
     items: list[OrderItem]
     fulfillment: Literal["delivery", "pickup", "unknown"]
     address: Optional[str]
-    date: Optional[str]          # YYYY-MM-DD
-    time: Optional[str]          # "pagi", "14:00", ...
+    date: Optional[dt.date]      # sent as format "date": the API itself forces YYYY-MM-DD
+    time: Optional[str] = Field(
+        pattern=r"^([01]\d|2[0-3]):[0-5]\d$",  # only a hint to the model; Pydantic checks it after
+        description="Exact time as HH:MM (24-hour), only if the customer gave one",
+    )
+    time_of_day: Optional[Literal["morning", "midday", "afternoon", "evening"]] = Field(
+        description="Part of the day, when the customer said one instead of (or with) an exact time. "
+                    "pagi = morning, siang = midday, sore = afternoon, malam = evening",
+    )
     payment_method: Optional[str]
     notes: Optional[str]
     questions_to_ask: list[str]  # what the admin must confirm before processing
@@ -83,8 +96,9 @@ def parse_message(text: str):
 
     Raises:
         ParseError: the model answered but there is no parsed result.
-        pydantic.ValidationError: the reply didn't match the schema, usually
-            because it was cut off at MAX_TOKENS. No usage is available.
+        pydantic.ValidationError: the reply didn't match the schema. Either it
+            broke a rule the API can't enforce (like the time pattern) or it was
+            cut off at MAX_TOKENS. No usage is available.
         anthropic.APIError: the request itself failed (network, rate limit, ...).
     """
     response = client.messages.parse(
@@ -138,8 +152,11 @@ def main() -> None:
         except ValidationError as e:
             failed += 1
             uncounted += 1
-            log(f"ERROR: reply didn't match the schema, probably cut off at "
-                f"max_tokens={MAX_TOKENS} ({e.error_count()} validation errors). "
+            first = e.errors()[0]
+            where = ".".join(str(part) for part in first["loc"]) or "reply"
+            log(f"ERROR: reply didn't match the schema ({e.error_count()} errors, first: "
+                f"{where}: {first['msg']}). Either a rule the API can't enforce, like the "
+                f"time pattern, or cut off at max_tokens={MAX_TOKENS}. "
                 f"This call was billed but its tokens are unknown.")
             continue
         except anthropic.APIError as e:
@@ -155,7 +172,7 @@ def main() -> None:
         log(f"\nTOTAL ({len(messages)} messages, {failed} failed): "
             + format_usage(total_input_tokens, total_output_tokens))
         if uncounted:
-            log(f"WARNING: total excludes {uncounted} cut-off call(s) whose tokens are unknown.")
+            log(f"WARNING: total excludes {uncounted} rejected call(s) whose tokens are unknown.")
 
     if failed:
         sys.exit(1)

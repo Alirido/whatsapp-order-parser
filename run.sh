@@ -27,4 +27,4 @@ mkdir -p runs
 } | tee "$out"
 
 python check_run.py "$out" --write
-echo "Now judge the 'Check by hand' rows in LOG.md, then fill in Score and Failed." >&2
+echo "Now judge the rows with a blank Pass in LOG.md, then fill in Score and Failed." >&2

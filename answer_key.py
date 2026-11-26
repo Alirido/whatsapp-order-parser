@@ -21,7 +21,7 @@ TODO = object()
 # so the model must not make one up).
 EXPECTED = {
     1:  {"intent": "new_order", "date": "2026-11-19", "fulfillment": "delivery", "item_count": 2,
-         "time": None, "time_of_day": "pagi"},
+         "time": None, "time_of_day": "morning"},
     2:  {"intent": "new_order", "date": "2026-11-23", "fulfillment": "delivery", "item_count": 3,
          "time": None, "time_of_day": None},
     3:  {"intent": "conditional_order", "date": None, "fulfillment": "unknown", "item_count": 1,
@@ -31,11 +31,11 @@ EXPECTED = {
     5:  {"intent": "change_order", "date": None, "fulfillment": "unknown", "item_count": 1,
          "time": None, "time_of_day": None},
     6:  {"intent": "new_order", "date": "2026-11-20", "fulfillment": "delivery", "item_count": 3,
-         "time": None, "time_of_day": "sore"},
+         "time": None, "time_of_day": "afternoon"},
     7:  {"intent": "new_order", "date": "2026-11-18", "fulfillment": "pickup", "item_count": 2,
-         "time": "14:00", "time_of_day": {None, "siang"}},  # "jam 2 siang": siang is optional here
+         "time": "14:00", "time_of_day": {None, "midday"}},  # "jam 2 siang": midday is optional here
     8:  {"intent": "new_order", "date": "2026-11-19", "fulfillment": "delivery", "item_count": 3,
-         "time": None, "time_of_day": "siang"},
+         "time": None, "time_of_day": "midday"},
     9:  {"intent": "new_order", "date": "2026-11-18", "fulfillment": "delivery", "item_count": 2,
          "time": None, "time_of_day": None},
     10: {"intent": "new_order", "date": None, "fulfillment": "delivery", "item_count": 1,

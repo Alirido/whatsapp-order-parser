@@ -13,7 +13,8 @@ is blank → fill in Pass, Score and Failed → commit the log.
 output to `runs/NN-name.txt` (this calls the API), then `check_run.py` adds the
 Summary row and a Run section below. In the Run table, each field from
 `answer_key.py` is ✓ (right), ✗ (wrong) or – (not checked: the field didn't
-exist yet in that run). Pass is filled with "no" when any field is ✗. A blank
+exist yet in that run, or the message errored and has no output). Pass is
+filled with "no" when any field is ✗ or the message errored. A blank
 Pass means the automatic checks passed and it's your call: anything invented?
 Product, spec and quantity right?
 

@@ -27,6 +27,7 @@ RUN_HEADER = re.compile(r"^commit: (\S+)\s+date: (\S+)$", re.MULTILINE)
 ELAPSED = re.compile(r"^elapsed: (\d+)s$", re.MULTILINE)
 TOTAL = re.compile(r"^TOTAL \(\d+ messages, (\d+) failed\): "
                    r"tokens: ([\d,]+) in / ([\d,]+) out\s+cost: \$([\d.]+)", re.MULTILINE)
+UNCOUNTED = re.compile(r"^WARNING: total excludes (\d+) ", re.MULTILINE)
 LABELS = {"item_count": "items"}           # shorter column names
 MARKS = {True: "✓", False: "✗", None: "–"}  # – = not checked for this message
 
@@ -121,10 +122,13 @@ def build_entry(run_path):
     fields = columns()
     passed = {field: 0 for field in fields}
     checked = {field: 0 for field in fields}
-    rows, failed = [], []
+    rows, failed, errored = [], [], 0
     for number, (parsed, error) in sorted(read_messages(text).items()):
         if error:
-            marks = {field: False for field in key_for(number)}
+            # No output to check: leave the fields out of the per-field totals,
+            # so one bad reply doesn't look like an intent/date/... mistake.
+            errored += 1
+            marks = {}
             notes = [f"ERROR: {error}"]
         else:
             marks, notes = check(number, parsed)
@@ -144,7 +148,10 @@ def build_entry(run_path):
         failed_calls, tokens_in, tokens_out, cost = total.groups()
         usage = f"Tokens: {tokens_in} in / {tokens_out} out · cost ${cost}"
         if failed_calls != "0":
-            usage += f" ({failed_calls} calls failed, see the run file)"
+            uncounted = UNCOUNTED.search(text)
+            usage += (f" ({failed_calls} calls failed, see the run file"
+                      + (f"; {uncounted.group(1)} of them billed but not in this total)"
+                         if uncounted else ")"))
     else:
         cost = "?"
         usage = "Tokens: ? (no TOTAL line: did the run finish?)"
@@ -153,6 +160,8 @@ def build_entry(run_path):
 
     totals = " · ".join(f"{label(field)} {passed[field]}/{checked[field]}"
                         for field in fields if checked[field])
+    if errored:
+        totals += f" · {errored} message(s) errored, not counted in these"
 
     run_number, _, run_name = run_path.stem.partition("-")
     failed_list = ", ".join(str(n) for n in failed)
