@@ -1,14 +1,24 @@
-"""Check a saved parse_order.py run against answer_key.py and add it to LOG.md.
+"""Check a saved parse_order.py run against answer_key.py and record it in LOG.md.
 
 No API call: this only reads the run file that parse_order.py already wrote.
 
-    python check_run.py runs/02-dates.txt           # print the log entry
-    python check_run.py runs/02-dates.txt --write   # also add it to LOG.md
+    python check_run.py runs/02-dates.txt                     # print the log entry
+    python check_run.py runs/02-dates.txt --write             # also add it to LOG.md
+    python check_run.py runs/02-dates.txt --rescore           # preview a re-check
+    python check_run.py runs/02-dates.txt --rescore --write   # apply it to LOG.md
 
 It fills in the clerical parts of the log (date, commit, what changed, tokens,
 cost, time) and marks every field in answer_key.py as passed or failed. A row
 with a blank Pass column passed every automatic check and still needs your
-judgment (anything invented? right product, spec and quantity?).
+judgment (anything invented? right product, spec and quantity?): write "yes"
+or "no" there.
+
+--rescore re-checks a run that is already in the log, for when answer_key.py
+changed. On rows that still pass every automatic check it keeps your Pass
+verdict and Notes. Then it recomputes that run's Score and Failed in the
+Summary table (Score stays "?" until every row has a yes or no), so it is also
+how you fill those two in after judging the rows. What changed, Pattern and
+Next change are left as you wrote them.
 """
 import argparse
 import json
@@ -18,9 +28,10 @@ import sys
 from datetime import date
 from pathlib import Path
 
-from answer_key import EXPECTED, TODO
+from answer_key import EXPECTED, TODO, Contains
 
 PROJECT = Path(__file__).resolve().parent
+CODE_FILES = ("parse_order.py", "sample_messages.txt")  # the files that decide a run's output
 
 MESSAGE_HEADER = re.compile(r"^===== message (\d+)/\d+ =====$", re.MULTILINE)
 RUN_HEADER = re.compile(r"^commit: (\S+)\s+date: (\S+)$", re.MULTILINE)
@@ -28,6 +39,7 @@ ELAPSED = re.compile(r"^elapsed: (\d+)s$", re.MULTILINE)
 TOTAL = re.compile(r"^TOTAL \(\d+ messages, (\d+) failed\): "
                    r"tokens: ([\d,]+) in / ([\d,]+) out\s+cost: \$([\d.]+)", re.MULTILINE)
 UNCOUNTED = re.compile(r"^WARNING: total excludes (\d+) ", re.MULTILINE)
+CELL_BORDER = re.compile(r"(?<!\\)\|")      # a | that isn't escaped as \| inside a cell
 LABELS = {"item_count": "items"}           # shorter column names
 MARKS = {True: "✓", False: "✗", None: "–"}  # – = not checked for this message
 
@@ -55,10 +67,22 @@ def cell(text):
     return str(text).replace("|", "\\|")
 
 
+def row(cells):
+    """One markdown table row."""
+    return "| " + " | ".join(cells) + " |"
+
+
+def split_row(line):
+    """The cells of a markdown table row, as written (escaped pipes kept)."""
+    return [c.strip() for c in CELL_BORDER.split(line.strip())[1:-1]]
+
+
 def show(value):
     """A value written the way it appears in the JSON output."""
     if isinstance(value, set):
         return " or ".join(sorted(show(v) for v in value))
+    if isinstance(value, Contains):
+        return f"text containing {json.dumps(value.text, ensure_ascii=False)}"
     return json.dumps(value, ensure_ascii=False)
 
 
@@ -79,6 +103,15 @@ def columns():
     return fields
 
 
+def matches(got, want):
+    """Does one value from the output satisfy one answer-key value?"""
+    if isinstance(want, set):
+        return any(matches(got, option) for option in want)
+    if isinstance(want, Contains):
+        return isinstance(got, str) and want.text.lower() in got.lower()
+    return got == want
+
+
 def check(number, parsed):
     """Compare one parsed message with its answer key.
 
@@ -92,7 +125,7 @@ def check(number, parsed):
             got = parsed[field]
         else:
             continue
-        ok = got in want if isinstance(want, set) else got == want
+        ok = matches(got, want)
         marks[field] = ok
         if not ok:
             notes.append(f"{label(field)}: expected {show(want)}, got {show(got)}")
@@ -105,8 +138,32 @@ def git(*args):
     return result.stdout.strip() if result.returncode == 0 else ""
 
 
-def build_entry(run_path):
-    """Return (summary table row, run section) as markdown."""
+def describe_changes(run_path, commit):
+    """The subjects of the commits that changed the code since the previous run.
+
+    The previous run is the last file in the same folder that sorts before this
+    one and has a 'commit:' line. Only commits touching CODE_FILES count: an
+    answer-key or log change doesn't change what the model produced."""
+    earlier = sorted(p for p in run_path.parent.glob("*.txt") if p.name < run_path.name)
+    for previous in reversed(earlier):
+        header = RUN_HEADER.search(previous.read_text(encoding="utf-8"))
+        if header:
+            break
+    else:
+        return "Baseline"
+    previous_commit, previous_number = header.group(1), previous.stem.partition("-")[0]
+    for c in (previous_commit, commit):
+        if not git("rev-parse", "--verify", "--quiet", f"{c}^{{commit}}"):
+            return f"? (commit {c} not found)"
+    subjects = git("log", "--reverse", "--format=%s", f"{previous_commit}..{commit}",
+                   "--", *CODE_FILES)
+    if not subjects:
+        return f"No code change since run {previous_number} (repeat run)"
+    return "; ".join(subjects.splitlines())
+
+
+def score_run(run_path):
+    """Check every message in a run file against the answer key."""
     text = run_path.read_text(encoding="utf-8")
 
     header = RUN_HEADER.search(text)
@@ -117,12 +174,11 @@ def build_entry(run_path):
         run_date = date.fromtimestamp(run_path.stat().st_mtime).isoformat()
         print(f"note: {run_path.name} has no 'commit:' line, so assuming HEAD ({commit}) "
               f"and the file's date ({run_date})", file=sys.stderr)
-    what_changed = git("log", "-1", "--format=%s", commit)
 
     fields = columns()
     passed = {field: 0 for field in fields}
     checked = {field: 0 for field in fields}
-    rows, failed, errored = [], [], 0
+    rows, errored = [], 0
     for number, (parsed, error) in sorted(read_messages(text).items()):
         if error:
             # No output to check: leave the fields out of the per-field totals,
@@ -135,13 +191,12 @@ def build_entry(run_path):
         for field, ok in marks.items():
             checked[field] += 1
             passed[field] += ok
-        if error or not all(marks.values()):
-            failed.append(number)
-            verdict = "no"
-        else:
-            verdict = ""
-        cells = [MARKS[marks.get(field)] for field in fields]
-        rows.append("| " + " | ".join([str(number), *cells, verdict, cell("; ".join(notes))]) + " |")
+        rows.append({
+            "number": str(number),
+            "marks": [MARKS[marks.get(field)] for field in fields],
+            "pass": "no" if error or not all(marks.values()) else "",
+            "notes": cell("; ".join(notes)),
+        })
 
     total = TOTAL.search(text)
     if total:
@@ -164,24 +219,49 @@ def build_entry(run_path):
         totals += f" · {errored} message(s) errored, not counted in these"
 
     run_number, _, run_name = run_path.stem.partition("-")
-    failed_list = ", ".join(str(n) for n in failed)
-    summary_row = (f"| {run_number} | {run_date} | {commit} | {cell(what_changed)} "
-                   f"| ?/{len(rows)} | ${cost} | {failed_list} |")
+    return {"commit": commit, "date": run_date, "fields": fields, "rows": rows,
+            "totals": totals, "usage": usage, "cost": cost,
+            "number": run_number, "name": run_name}
 
-    title = f"Run {run_number}: {run_name}" if run_name else f"Run {run_number}"
-    names = [label(field) for field in fields]
+
+def results_lines(run):
+    """The results table, Fields line and Tokens line of a Run section."""
+    names = [label(field) for field in run["fields"]]
+    return [
+        row(["#", *names, "Pass", "Notes"]),
+        row(["---"] * (len(names) + 3)),
+        *(row([r["number"], *r["marks"], r["pass"], r["notes"]]) for r in run["rows"]),
+        "",
+        f"Fields: {run['totals']}",
+        "",
+        run["usage"],
+    ]
+
+
+def score_and_failed(rows):
+    """Score ("7/10", or "?/10" while a row has no yes/no) and the Failed list."""
+    verdicts = [r["pass"].strip().lower() for r in rows]
+    failed = ", ".join(r["number"] for r, v in zip(rows, verdicts) if v == "no")
+    decided = all(v in ("yes", "no") for v in verdicts)
+    score = f"{verdicts.count('yes')}/{len(rows)}" if decided else f"?/{len(rows)}"
+    return score, failed
+
+
+def build_entry(run_path):
+    """Return (summary table row, run section) as markdown for a new run."""
+    run = score_run(run_path)
+    score, failed = score_and_failed(run["rows"])
+    summary_row = row([run["number"], run["date"], run["commit"],
+                       cell(describe_changes(run_path, run["commit"])),
+                       score, f"${run['cost']}", failed])
+
+    title = f"Run {run['number']}: {run['name']}" if run["name"] else f"Run {run['number']}"
     section = "\n".join([
-        f"## {title} ({commit})",
+        f"## {title} ({run['commit']})",
         "",
         f"Raw output: `runs/{run_path.name}`",
         "",
-        "| " + " | ".join(["#", *names, "Pass", "Notes"]) + " |",
-        "| " + " | ".join(["---"] * (len(names) + 3)) + " |",
-        *rows,
-        "",
-        f"Fields: {totals}",
-        "",
-        usage,
+        *results_lines(run),
         "",
         "Pattern:",
         "",
@@ -196,7 +276,7 @@ def write_to_log(log_path, run_path, summary_row, section):
     text = log_path.read_text(encoding="utf-8")
     if f"`runs/{run_path.name}`" in text:
         sys.exit(f"{log_path.name} already has an entry for runs/{run_path.name}; "
-                 "not adding it twice.")
+                 "not adding it twice (use --rescore to re-check it).")
 
     lines = text.split("\n")
     try:
@@ -214,12 +294,100 @@ def write_to_log(log_path, run_path, summary_row, section):
     log_path.write_text("\n".join(lines).rstrip("\n") + "\n\n" + section, encoding="utf-8")
 
 
+def section_bounds(lines, start):
+    """Index of the next '## ' heading after start, or the end of the file."""
+    return next((i for i in range(start + 1, len(lines)) if lines[i].startswith("## ")),
+                len(lines))
+
+
+def rescore(log_path, run_path):
+    """Re-check a run that is already in the log. Returns (new log text, report)."""
+    run = score_run(run_path)
+    lines = log_path.read_text(encoding="utf-8").split("\n")
+
+    marker = f"Raw output: `runs/{run_path.name}`"
+    if marker not in lines:
+        sys.exit(f"{log_path.name} has no entry for runs/{run_path.name}; "
+                 "run without --rescore to add it.")
+    start = lines.index(marker)
+    end = section_bounds(lines, start)
+    table = [i for i in range(start, end) if lines[i].startswith("|")]
+    usage = [i for i in range(start, end) if lines[i].startswith("Tokens:")]
+    if len(table) < 2 or not usage or usage[0] < table[0]:
+        sys.exit(f"can't find the results table and Tokens line for "
+                 f"runs/{run_path.name} in {log_path.name}")
+
+    # What the log said before. A row with a ✗ or an ERROR got its "no" from this
+    # script; any other row's Pass and Notes are yours.
+    header = split_row(lines[table[0]])
+    pass_col, notes_col = header.index("Pass"), header.index("Notes")
+    before = {}
+    for i in table[2:]:
+        cells = split_row(lines[i])
+        auto_failed = "✗" in cells[1:pass_col] or cells[notes_col].startswith("ERROR:")
+        before[cells[0]] = (auto_failed, cells[pass_col], cells[notes_col])
+
+    changes = []
+    for r in run["rows"]:
+        if r["number"] not in before:
+            continue
+        was_failed, old_pass, old_notes = before[r["number"]]
+        now_failed = r["pass"] == "no"
+        if not was_failed and not now_failed:
+            r["pass"], r["notes"] = old_pass, old_notes
+        elif not was_failed and now_failed:
+            if old_notes:
+                r["notes"] = f"{r['notes']}; {old_notes}"
+            changes.append(f"message {r['number']} now fails: {r['notes']}")
+        elif was_failed and not now_failed:
+            changes.append(f"message {r['number']} now passes the automatic checks: "
+                           "judge it and fill in Pass")
+
+    lines[table[0]:usage[0] + 1] = results_lines(run)
+
+    try:
+        summary = lines.index("## Summary")
+    except ValueError:
+        sys.exit(f"no '## Summary' heading in {log_path.name}")
+    summary_table = [i for i in range(summary, section_bounds(lines, summary))
+                     if lines[i].startswith("|")]
+    header = split_row(lines[summary_table[0]])
+    score_col, failed_col = header.index("Score"), header.index("Failed")
+    score, failed = score_and_failed(run["rows"])
+    for i in summary_table[2:]:
+        cells = split_row(lines[i])
+        if cells[0] == run["number"]:
+            changes.append(f"Score {cells[score_col] or '(blank)'} -> {score}, "
+                           f"Failed {cells[failed_col] or '(none)'} -> {failed or '(none)'}")
+            cells[score_col], cells[failed_col] = score, failed
+            lines[i] = row(cells)
+            break
+    else:
+        sys.exit(f"no row for run {run['number']} in the Summary table of {log_path.name}")
+
+    report = "\n".join([f"Run {run['number']} ({run_path.name}):",
+                        *(f"  {c}" for c in changes), "", *results_lines(run)])
+    return "\n".join(lines), report
+
+
 def main():
     parser = argparse.ArgumentParser(description="Check a saved run and log it")
     parser.add_argument("run_file", type=Path, help="e.g. runs/02-dates.txt")
-    parser.add_argument("--write", action="store_true", help="add the entry to the log")
+    parser.add_argument("--write", action="store_true", help="change LOG.md (otherwise just print)")
+    parser.add_argument("--rescore", action="store_true",
+                        help="re-check a run that is already in the log (after changing answer_key.py)")
     parser.add_argument("--log", type=Path, default=PROJECT / "LOG.md", help="default: LOG.md")
     args = parser.parse_args()
+
+    if args.rescore:
+        new_text, report = rescore(args.log, args.run_file)
+        print(report)
+        if args.write:
+            args.log.write_text(new_text, encoding="utf-8")
+            print(f"Updated {args.log.name}.", file=sys.stderr)
+        else:
+            print("(preview only: add --write to update the log)", file=sys.stderr)
+        return
 
     summary_row, section = build_entry(args.run_file)
     print("Summary row:\n" + summary_row + "\n\n" + section)

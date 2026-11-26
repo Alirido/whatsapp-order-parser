@@ -7,7 +7,12 @@ Fixed for every run: model `claude-haiku-5-5`, effort `medium`, today = 2026-11-
 **and** nothing is invented.
 
 **Workflow per run:** commit → `./run.sh NN-name` → judge every row whose Pass
-is blank → fill in Pass, Score and Failed → commit the log.
+is blank and write "yes" or "no" → `python check_run.py runs/NN-name.txt --rescore --write`
+(fills in Score and Failed) → commit the log.
+
+**Changed `answer_key.py`?** Re-check every old run the same way (no API call),
+so all runs are scored by the same key. Your yes/no stays on rows that still
+pass the automatic checks; a row that now fails becomes "no".
 
 `run.sh` refuses to run with uncommitted changes to `parse_order.py`, saves the
 output to `runs/NN-name.txt` (this calls the API), then `check_run.py` adds the
@@ -23,7 +28,7 @@ Product, spec and quantity right?
 | Run | Date       | Commit  | What changed                                      | Score | Cost      | Failed              |
 | --- | ---------- | ------- | ------------------------------------------------- | ----- | --------- | ------------------- |
 | 01  | 2026-11-25 | 415dc5f | Baseline                                          | 3/10  | $0.006057 | 1, 2, 3, 4, 6, 7, 8 |
-| 02  | 2026-11-26 | 1ba31ca | imporvement to unit description in parse_order.py | 10/10 | $0.006421 |                     |
+| 02  | 2026-11-26 | 1ba31ca | parse_order: typed date/time, time_of_day, closed unit list, conditional_order; improved unit description | 10/10 | $0.006421 |                     |
 
 ## Backlog
 

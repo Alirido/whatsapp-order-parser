@@ -10,12 +10,23 @@ For each message, list the fields to check by exact match:
 Values:
   - a plain value must match exactly: "2026-11-19", None (= null), 2
   - a set accepts any of its members: {"question", "new_order"}
+  - Contains("Setiabudi") accepts any text that contains it, ignoring case
+    ("Jl. Setiabudi 210" passes, null fails). It can go in a set too:
+    {None, Contains("Setiabudi")}
   - TODO means "not decided yet", so the field is skipped
 
 Leave a field out entirely when you'd rather judge it by hand.
+After changing this file, re-check old runs without calling the API:
+    python check_run.py runs/NN-name.txt --rescore --write
 """
+from dataclasses import dataclass
 
 TODO = object()
+
+
+@dataclass(frozen=True)  # frozen = hashable, so it can sit inside a set
+class Contains:
+    text: str
 
 # time / time_of_day: a None here is also an invention check (no time was given,
 # so the model must not make one up).
