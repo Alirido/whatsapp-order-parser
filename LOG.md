@@ -20,10 +20,10 @@ Product, spec and quantity right?
 
 ## Summary
 
-| Run | Date       | Commit  | What changed                                      | Score | Cost      | Failed           |
-| --- | ---------- | ------- | ------------------------------------------------- | ----- | --------- | ---------------- |
-| 01  | 2026-11-25 | 415dc5f | Baseline                                          | 4/10  | $0.006057 | 1, 2, 3, 6, 7, 8 |
-| 02  | 2026-11-26 | 1ba31ca | imporvement to unit description in parse_order.py | 9/10  | $0.006421 | 4                |
+| Run | Date       | Commit  | What changed                                      | Score | Cost      | Failed              |
+| --- | ---------- | ------- | ------------------------------------------------- | ----- | --------- | ------------------- |
+| 01  | 2026-11-25 | 415dc5f | Baseline                                          | 3/10  | $0.006057 | 1, 2, 3, 4, 6, 7, 8 |
+| 02  | 2026-11-26 | 1ba31ca | imporvement to unit description in parse_order.py | 10/10 | $0.006421 |                     |
 
 ## Backlog
 
@@ -48,7 +48,7 @@ Raw output: `runs/01-baseline.txt`
 | 1   | ✓      | ✓    | ✓           | ✓     | ✗    | –           | no   | time: expected null, got "pagi"                                                        |
 | 2   | ✓      | ✗    | ✓           | ✓     | ✓    | –           | no   | date: expected "2026-11-23", got "Senin, 23 Nov 2026"                                  |
 | 3   | ✗      | ✓    | ✓           | ✓     | ✓    | –           | no   | intent: expected "conditional_order", got "new_order"                                  |
-| 4   | ✓      | ✓    | ✓           | ✓     | ✓    | –           |      |                                                                                        |
+| 4   | ✓      | ✗    | ✓           | ✓     | ✓    | –           | no   | date: expected "2026-11-19", got null                                                  |
 | 5   | ✓      | ✓    | ✓           | ✓     | ✓    | –           |      |                                                                                        |
 | 6   | ✓      | ✗    | ✓           | ✓     | ✗    | –           | no   | date: expected "2026-11-20", got "Jumat, 20 Nov 2026"; time: expected null, got "sore" |
 | 7   | ✓      | ✗    | ✓           | ✓     | ✓    | –           | no   | date: expected "2026-11-18", got null                                                  |
@@ -56,7 +56,7 @@ Raw output: `runs/01-baseline.txt`
 | 9   | ✓      | ✓    | ✓           | ✓     | ✓    | –           |      |                                                                                        |
 | 10  | ✓      | ✓    | ✓           | ✓     | ✓    | –           |      |                                                                                        |
 
-Fields: intent 9/10 · date 7/10 · fulfillment 10/10 · items 10/10 · time 7/10
+Fields: intent 9/10 · date 6/10 · fulfillment 10/10 · items 10/10 · time 7/10
 
 Tokens: 17,162 in / 8,682 out · cost $0.006057 · time ?
 
@@ -73,7 +73,7 @@ Raw output: `runs/02-typed-fields.txt`
 | 1   | ✓      | ✓    | ✓           | ✓     | ✓    | ✓           |      |                                       |
 | 2   | ✓      | ✓    | ✓           | ✓     | ✓    | ✓           |      |                                       |
 | 3   | ✓      | ✓    | ✓           | ✓     | ✓    | ✓           |      |                                       |
-| 4   | ✓      | ✗    | ✓           | ✓     | ✓    | ✓           | no   | date: expected null, got "2026-11-19" |
+| 4   | ✓      | ✓    | ✓           | ✓     | ✓    | ✓           |      |                                       |
 | 5   | ✓      | ✓    | ✓           | ✓     | ✓    | ✓           |      |                                       |
 | 6   | ✓      | ✓    | ✓           | ✓     | ✓    | ✓           |      |                                       |
 | 7   | ✓      | ✓    | ✓           | ✓     | ✓    | ✓           |      |                                       |
@@ -81,7 +81,7 @@ Raw output: `runs/02-typed-fields.txt`
 | 9   | ✓      | ✓    | ✓           | ✓     | ✓    | ✓           |      |                                       |
 | 10  | ✓      | ✓    | ✓           | ✓     | ✓    | ✓           |      |                                       |
 
-Fields: intent 10/10 · date 9/10 · fulfillment 10/10 · items 10/10 · time 10/10 · time_of_day 10/10
+Fields: intent 10/10 · date 10/10 · fulfillment 10/10 · items 10/10 · time 10/10 · time_of_day 10/10
 
 Tokens: 20,952 in / 8,651 out · cost $0.006421 · time 50s
 

@@ -12,7 +12,7 @@ guessed, and the admin should get a question about it.
 | 1 | new_order | Besi beton polos 10 mm × 20 batang; wiremesh M8 × 5 lembar; delivery to Jl. Gegerkalong Hilir No. 45; date 2026-11-19, morning; name Pak Budi; phone 081200001234 | Abbreviations: "btg", "a.n." (atas nama = in the name of) |
 | 2 | new_order | Semen Tiga Roda × 40 sak; pasir × 1 truk; bata merah × 2000 pcs; delivery to Jl. Setiabudi 210; date 2026-11-23 (Monday); payment: transfer; name Ibu Rina, company CV Karya Bangun | Resolving "hari Senin" to a date |
 | 3 | question (or a conditional order) | Hollow 4x4 × 30 batang as a *conditional* item; a question for the admin about price and stock | It's not a confirmed order. No address, no name: all null, not invented |
-| 4 | question | No items. The customer asks tomorrow's opening hours | Must not create an order |
+| 4 | question | No items. The customer asks tomorrow's opening hours; date 2026-11-19 (besok) | Must not create an order |
 | 5 | change_order | Cancel besi 12 mm; add besi 13 mm with the *same quantity as before*; quantity = null plus a question | "jumlahnya sama" refers to an order this message doesn't contain. The quantity is unknown |
 | 6 | new_order | Besi 8 mm × 50 batang; besi 10 mm × **30** batang (not 25); kawat bendrat × 2 rol; delivery, date 2026-11-20 (lusa), afternoon; name Pak Asep; area Cijerah, exact address unknown | Self-correction "25 eh 30". "ke rumah" means the address must be confirmed |
 | 7 | new_order | Pipa PVC 3 inch × 12 batang; lem pipa × 6 (setengah lusin); **pickup**, not delivery; 14:00; name Yanto | Numbers in words. No date given: null or today, but never another date |
