@@ -26,7 +26,7 @@ EXPECTED = {
          "time": None, "time_of_day": None},
     3:  {"intent": "conditional_order", "date": None, "fulfillment": "unknown", "item_count": 1,
          "time": None, "time_of_day": None},
-    4:  {"intent": "question", "date": None, "fulfillment": "unknown", "item_count": 0,
+    4:  {"intent": "question", "date": "2026-11-19", "fulfillment": "unknown", "item_count": 0,
          "time": None, "time_of_day": None},
     5:  {"intent": "change_order", "date": None, "fulfillment": "unknown", "item_count": 1,
          "time": None, "time_of_day": None},
