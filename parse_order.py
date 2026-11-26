@@ -55,7 +55,15 @@ class ParsedMessage(BaseModel):
     phone: Optional[str]
     items: list[OrderItem]
     fulfillment: Literal["delivery", "pickup", "unknown"]
-    address: Optional[str]
+    address: Optional[str] = Field(
+        description="Where to deliver, as precise as the customer gave it, in their words. "
+                    "Keep street and house number when given (e.g. 'Jl. Merdeka 12'). "
+                    "An area, neighborhood or landmark alone is still an address (e.g. 'Antapani', "
+                    "'dekat Pasar Kosambi'), including the area they say they live in when they ask "
+                    "for delivery 'ke rumah'. Never add a street or number they didn't write. "
+                    "A reference with no place name ('ke rumah', 'alamat biasa') is null. "
+                    "If it's unclear or too general, ask for the details in `questions_to_ask`.",
+    )
     date: Optional[dt.date]      # sent as format "date": the API itself forces YYYY-MM-DD
     time: Optional[str] = Field(
         pattern=r"^([01]\d|2[0-3]):[0-5]\d$",  # only a hint to the model; Pydantic checks it after
